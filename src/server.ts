@@ -1,0 +1,16 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+import { createApp } from "./app";
+
+const PORT = process.env.PORT || 3000;
+
+async function start() {
+  const app = await createApp();
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+start();
