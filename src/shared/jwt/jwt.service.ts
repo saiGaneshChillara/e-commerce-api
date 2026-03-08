@@ -7,23 +7,22 @@ export interface JwtPayload {
 
 export class JwtService {
   private readonly secret: string;
-  private readonly expiresIn: SignOptions["expiresIn"];
+  private readonly signOptions: SignOptions;
 
-  constructor() {
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET not found in .env");
+  constructor(secret: string, expiresIn: string | number = "7d") {
+
+    if (!secret) {
+      throw new Error("JWT secret is required");
     }
 
-    this.secret = process.env.JWT_SECRET;
-    this.expiresIn = process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"] || "1d";
+    this.secret = secret;
+    this.signOptions = {
+      expiresIn: expiresIn as SignOptions["expiresIn"],
+    };
   }
 
   sign(payload: JwtPayload): string {
-    const options: SignOptions = {
-      expiresIn: this.expiresIn,
-    };
-
-    return jwt.sign(payload, this.secret, options);
+    return jwt.sign(payload, this.secret, this.signOptions);
   }
 
   verify(token: string): JwtPayload {
