@@ -1,15 +1,18 @@
 import express from "express";
 import { runMigrations } from "./infrastructure/database/migrate";
 import { PostgresUserRepository } from "./features/users/infrastructure/user.repository.pg";
-import { pool } from "./infrastructure/database/pool";
+import { getPool } from "./infrastructure/database/pool";
 import { JwtService } from "./shared/jwt/jwt.service";
 import { AuthService } from "./features/auth/application/auth.service";
 import { AuthController } from "./features/auth/auth.controller";
 import { createAuthRoutes } from "./features/auth/auth.routes";
-import { SignOptions } from "jsonwebtoken";
-import { createAuthMiddleware } from "./shared/middlewares/auth.middleware";
+import { PostgresProductRepository } from "./features/products/infrastructure/postgres-product.respository";
+import { ProductService } from "./features/products/application/product.service";
+import { ProductController } from "./features/products/presentation/product.controller";
+import { createProductRoutes } from "./features/products/presentation/product.routes";
 
 export async function createApp() {
+  const pool = getPool();
   await runMigrations(pool);
 
   const app = express();
@@ -26,24 +29,20 @@ export async function createApp() {
 
   // repositories
   const userRepository = new PostgresUserRepository(pool);
+  const productRepository = new PostgresProductRepository(pool);
   
   // services
   const jwtService = new JwtService(process.env.JWT_SECRET!, expiresIn);
   const authService = new AuthService(userRepository, jwtService);
+  const productService = new ProductService(productRepository);
 
   // controllers
   const authController = new AuthController(authService);
-
-  // middlewares
-  const authMiddleware = createAuthMiddleware(jwtService);
+  const productController = new ProductController(productService);
 
   app.use("/auth", createAuthRoutes(authController));
-  app.get("/protected", authMiddleware, (req, res) => {
-    res.json({
-      message: "You are authenticated",
-      user: req.user,
-    });
-  });
+  app.use("/products", createProductRoutes(productController, jwtService));
+ 
 
   return app;
 }
