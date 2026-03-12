@@ -10,6 +10,9 @@ import { PostgresProductRepository } from "./features/products/infrastructure/po
 import { ProductService } from "./features/products/application/product.service";
 import { ProductController } from "./features/products/presentation/product.controller";
 import { createProductRoutes } from "./features/products/presentation/product.routes";
+import { UserService } from "./features/users/application/user.service";
+import { UserController } from "./features/users/presentation/user.controller";
+import { createUserRoutes } from "./features/users/presentation/user.routes";
 
 export async function createApp() {
   const pool = getPool();
@@ -35,13 +38,16 @@ export async function createApp() {
   const jwtService = new JwtService(process.env.JWT_SECRET!, expiresIn);
   const authService = new AuthService(userRepository, jwtService);
   const productService = new ProductService(productRepository);
+  const userService = new UserService(userRepository);
 
   // controllers
   const authController = new AuthController(authService);
   const productController = new ProductController(productService);
+  const userController = new UserController(userService);
 
   app.use("/auth", createAuthRoutes(authController));
   app.use("/products", createProductRoutes(productController, jwtService));
+  app.use("/users", createUserRoutes(userController, jwtService));
  
 
   return app;

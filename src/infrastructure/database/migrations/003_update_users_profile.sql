@@ -1,0 +1,3 @@
+ALTER TABLE users
+ADD COLUMN name TEXT,
+ADD COlUMN phone_number TEXT UNIQUE;
