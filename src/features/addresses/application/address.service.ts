@@ -17,10 +17,11 @@ export class AddressService {
 
   async updateAddress(userId: string, addressId: string, data: UpdateAddressInput) {
     if (data.isDefault) {
-      this.addressRepository.clearDefault(userId);
+      await this.addressRepository.clearDefault(userId);
     }
 
     return this.addressRepository.update(addressId, userId, data);
+  }
   }
 
   async deleteAddress(userId: string, addressId: string) {
