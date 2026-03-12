@@ -13,6 +13,10 @@ import { createProductRoutes } from "./features/products/presentation/product.ro
 import { UserService } from "./features/users/application/user.service";
 import { UserController } from "./features/users/presentation/user.controller";
 import { createUserRoutes } from "./features/users/presentation/user.routes";
+import { PostgresAddressRepository } from "./features/addresses/infrastructure/poststgress-address.repository";
+import { AddressController } from "./features/addresses/presentation/address.controller";
+import { AddressService } from "./features/addresses/application/address.service";
+import { createAddressRoutes } from "./features/addresses/infrastructure/address.routes";
 
 export async function createApp() {
   const pool = getPool();
@@ -33,22 +37,25 @@ export async function createApp() {
   // repositories
   const userRepository = new PostgresUserRepository(pool);
   const productRepository = new PostgresProductRepository(pool);
+  const addressRepository = new PostgresAddressRepository(pool);
   
   // services
   const jwtService = new JwtService(process.env.JWT_SECRET!, expiresIn);
   const authService = new AuthService(userRepository, jwtService);
   const productService = new ProductService(productRepository);
   const userService = new UserService(userRepository);
+  const addressService = new AddressService(addressRepository);
 
   // controllers
   const authController = new AuthController(authService);
   const productController = new ProductController(productService);
   const userController = new UserController(userService);
+  const addressController = new AddressController(addressService);
 
   app.use("/auth", createAuthRoutes(authController));
   app.use("/products", createProductRoutes(productController, jwtService));
   app.use("/users", createUserRoutes(userController, jwtService));
+  app.use("/addresses", createAddressRoutes(addressController, jwtService));
  
-
   return app;
 }
