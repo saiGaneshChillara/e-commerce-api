@@ -12,9 +12,9 @@ export interface CreateAddressInput {
 
 export interface UpdateAddressInput {
   line1?: string;
-  line2?: string;
+  line2?: string | null;
   city?: string;
-  state?: string;
+  state?: string | null;
   postalCode?: string;
   country?: string;
   isDefault?: boolean;
