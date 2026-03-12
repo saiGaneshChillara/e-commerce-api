@@ -22,7 +22,6 @@ export class AddressService {
 
     return this.addressRepository.update(addressId, userId, data);
   }
-  }
 
   async deleteAddress(userId: string, addressId: string) {
     await this.addressRepository.delete(addressId, userId);

@@ -58,7 +58,6 @@ export class PostgresAddressRepository implements AddressRepository {
 
     return this.mapRow(result.rows[0]);
   }
-  }
   async update(addressId: string, userId: string, data: UpdateAddressInput): Promise<Address> {
     const result = await this.pool.query(
       `UPDATE addresses
@@ -84,6 +83,10 @@ export class PostgresAddressRepository implements AddressRepository {
         userId
       ]
     );
+
+    if (result.rowCount === 0) {
+      throw new Error("Address not found");
+    }
 
     return this.mapRow(result.rows[0]);
   }
