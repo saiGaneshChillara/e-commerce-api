@@ -52,7 +52,12 @@ export class PostgresAddressRepository implements AddressRepository {
       [id]
     );
 
+    if (result.rowCount === 0) {
+      return null;
+    }
+
     return this.mapRow(result.rows[0]);
+  }
   }
   async update(addressId: string, userId: string, data: UpdateAddressInput): Promise<Address> {
     const result = await this.pool.query(
