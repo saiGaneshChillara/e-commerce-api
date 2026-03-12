@@ -24,7 +24,11 @@ export class UserService {
 
     const dbUser = await this.userRepository.findByEmail(user.email);
 
-    const valid = await bcrypt.compare(currentPassword, dbUser!.passwordHash);
+    if (!dbUser) {
+      throw new Error("User not found");
+    }
+
+    const valid = await bcrypt.compare(currentPassword, dbUser.passwordHash);
 
     if (!valid) {
       throw new Error("Current password is incorrect");

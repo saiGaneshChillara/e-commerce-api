@@ -40,6 +40,10 @@ export class PostgresUserRepository implements UserRepository {
       ]
     );
 
+    if (result.rows.length === 0) {
+      throw new Error("User not found");
+    }
+
     return this.mapRowToUser(result.rows[0]);
   }
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
